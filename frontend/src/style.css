@@ -48,14 +48,14 @@ body {
 
 .game-board {
   display: grid;
-  grid-template-columns: 30px repeat(8, 1fr);
-  grid-template-rows: 30px repeat(8, 1fr);
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   gap: 2px;
   background: var(--color-board-border);
   border: 2px solid var(--color-board-border);
   border-radius: 8px;
-  width: 510px;
-  height: 510px;
+  width: 480px;
+  height: 480px;
 }
 
 .cell {
@@ -86,29 +86,7 @@ body {
   opacity: 0.7;
 }
 
-/* 좌표 표시 */
-.coordinate-row {
-  display: contents;
-}
-
-.coordinate-cell {
-  background: var(--color-board-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-white);
-  user-select: none;
-}
-
-.coordinate-cell.top {
-  grid-row: 1;
-}
-
-.coordinate-cell.left {
-  grid-column: 1;
-}
+/* 좌표 표시 - 8x8 그리드에서는 사용하지 않음 */
 
 /* 마지막 수 표시 */
 .cell.last-move {
@@ -566,9 +544,7 @@ body {
     height: 340px;
   }
   
-  .coordinate-cell {
-    font-size: 12px;
-  }
+
   
   .last-move-indicator {
     width: 6px;
