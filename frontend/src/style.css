@@ -126,21 +126,27 @@ body {
 
 .last-move-indicator {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  font-size: 16px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #ff6b35;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
   z-index: 10;
-  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 0 2px #ff6b35, 0 2px 8px rgba(255, 107, 53, 0.4);
+  animation: gentle-pulse 2s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes gentle-pulse {
   0%, 100% {
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
   50% {
-    transform: scale(1.2);
-    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.9;
   }
 }
 
@@ -565,9 +571,10 @@ body {
   }
   
   .last-move-indicator {
-    font-size: 14px;
-    top: -6px;
-    right: -6px;
+    width: 6px;
+    height: 6px;
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 0 1px #ff6b35, 0 1px 4px rgba(255, 107, 53, 0.4);
   }
   
   .stone {

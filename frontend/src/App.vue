@@ -28,9 +28,7 @@
             <div
               v-if="isLastMove(rowIndex, colIndex)"
               class="last-move-indicator"
-            >
-              ⭐
-            </div>
+            ></div>
           </div>
         </div>
       </div>
