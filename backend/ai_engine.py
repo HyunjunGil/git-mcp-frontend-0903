@@ -9,7 +9,7 @@ from typing import List, Tuple, Optional
 from game_engine import OthelloGame
 
 class OthelloAI:
-    def __init__(self, max_depth: int = 8, time_limit: float = 2.5):
+    def __init__(self, max_depth: int = 6, time_limit: float = 4.0):
         self.max_depth = max_depth
         self.time_limit = time_limit
         
@@ -51,9 +51,9 @@ class OthelloAI:
         if not valid_moves:
             return None
         
-        # 수가 적으면 완전탐색
+        # 수가 적으면 완전탐색 (하지만 시간 제한은 유지)
         if len(valid_moves) <= 4:
-            return self._minimax_with_alpha_beta(game, self.max_depth + 2)
+            return self._minimax_with_alpha_beta(game, self.max_depth + 1)
         
         # 일반적인 경우
         return self._minimax_with_alpha_beta(game, self.max_depth)
@@ -72,8 +72,8 @@ class OthelloAI:
         sorted_moves = self._order_moves(game, valid_moves)
         
         for move in sorted_moves:
-            # 시간 제한 확인
-            if time.time() - start_time > self.time_limit:
+            # 시간 제한 확인 (더 엄격하게)
+            if time.time() - start_time > self.time_limit * 0.8:  # 80% 시간에 도달하면 중단
                 break
             
             # 수 시뮬레이션
