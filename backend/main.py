@@ -50,6 +50,7 @@ class GameState(BaseModel):
     player1_name: Optional[str] = None
     player2_name: Optional[str] = None
     last_action: Optional[str] = None
+    last_move: Optional[Tuple[int, int]] = None
 
 @app.post("/api/game/new")
 async def new_game(request: NewGameRequest):
@@ -123,7 +124,13 @@ async def ai_move(game_id: str):
     
     # AI가 현재 플레이어인 경우에만 착수
     if game.current_player == game.ai_player:
+        import time
+        start_time = time.time()
         best_move = ai_engine.get_best_move(game)
+        end_time = time.time()
+        
+        print(f"AI thinking time: {end_time - start_time:.2f} seconds")
+        
         if best_move:
             game.make_move(best_move[0], best_move[1])
         else:

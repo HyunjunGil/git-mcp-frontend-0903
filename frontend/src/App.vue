@@ -11,7 +11,10 @@
             v-for="(cell, colIndex) in row"
             :key="colIndex"
             class="cell"
-            :class="{ 'valid-move': isValidMove(rowIndex, colIndex) }"
+            :class="{ 
+              'valid-move': isValidMove(rowIndex, colIndex),
+              'last-move': isLastMove(rowIndex, colIndex)
+            }"
             @click="makeMove(rowIndex, colIndex)"
           >
             <div
@@ -22,6 +25,12 @@
               v-else-if="cell === 2"
               class="stone white"
             ></div>
+            <div
+              v-if="isLastMove(rowIndex, colIndex)"
+              class="last-move-indicator"
+            >
+              ⭐
+            </div>
           </div>
         </div>
       </div>
@@ -79,6 +88,9 @@
         </div>
         <div v-if="passCount > 0" class="pass-info">
           Pass Count: {{ passCount }}
+        </div>
+        <div v-if="lastMove" class="last-move-info">
+          Last Move: {{ formatMove(lastMove) }}
         </div>
         <div class="instruction">
           {{ instructionText }}
@@ -198,7 +210,8 @@ export default {
       aiPlayer: 2,
       player1Name: 'Player 1',
       player2Name: 'Player 2',
-      lastAction: 'move'
+      lastAction: 'move',
+      lastMove: null
     }
   },
   computed: {
@@ -376,6 +389,7 @@ export default {
       this.statusMessage = state.status_message || ''
       this.canPass = state.can_pass || false
       this.lastAction = state.last_action || 'move'
+      this.lastMove = state.last_move || null
       
       // 게임 모드 정보 업데이트
       if (state.mode) {
@@ -397,6 +411,18 @@ export default {
     
     isValidMove(row, col) {
       return this.validMoves.some(move => move[0] === row && move[1] === col)
+    },
+    
+    isLastMove(row, col) {
+      return this.lastMove && this.lastMove[0] === row && this.lastMove[1] === col
+    },
+    
+    formatMove(move) {
+      if (!move) return ''
+      const [row, col] = move
+      const colLetter = String.fromCharCode(65 + col) // A, B, C, ...
+      const rowNumber = row + 1 // 1-based row number
+      return `${colLetter}${rowNumber}`
     },
     
     async passTurn() {

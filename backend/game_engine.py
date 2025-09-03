@@ -26,6 +26,7 @@ class OthelloGame:
         self.game_over = False
         self.winner = None
         self.pass_count = 0  # 연속 패스 횟수
+        self.last_move = None  # 마지막 수 위치 (row, col)
         
         # 8방향 벡터 (상, 하, 좌, 우, 대각선)
         self.directions = [
@@ -81,6 +82,9 @@ class OthelloGame:
         # 돌 놓기
         self.board[row][col] = self.current_player
         
+        # 마지막 수 위치 저장
+        self.last_move = (row, col)
+        
         # 8방향으로 상대방 돌 뒤집기
         for dr, dc in self.directions:
             self._flip_in_direction(row, col, dr, dc)
@@ -112,6 +116,7 @@ class OthelloGame:
     def pass_turn(self):
         """차례 패스"""
         self.pass_count += 1
+        self.last_move = None  # 패스 시 마지막 수 위치 초기화
         self.current_player = 2 if self.current_player == 1 else 1
         self._check_game_over()
     
@@ -225,7 +230,8 @@ class OthelloGame:
             "player2_name": self.player2_name,
             "human_player": self.human_player if self.mode == "human_vs_ai" else None,
             "ai_player": self.ai_player if self.mode == "human_vs_ai" else None,
-            "last_action": last_action
+            "last_action": last_action,
+            "last_move": self.last_move
         }
     
     def copy(self):
@@ -236,4 +242,5 @@ class OthelloGame:
         new_game.game_over = self.game_over
         new_game.winner = self.winner
         new_game.pass_count = self.pass_count
+        new_game.last_move = self.last_move
         return new_game
