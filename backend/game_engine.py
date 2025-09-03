@@ -7,7 +7,7 @@ from typing import List, Tuple, Optional
 import copy
 
 class OthelloGame:
-    def __init__(self):
+    def __init__(self, mode="human_vs_ai", human_player=1, player1_name="Player 1", player2_name="Player 2"):
         # 8x8 보드 초기화 (0: 빈칸, 1: 흑돌, 2: 백돌)
         self.board = [[0 for _ in range(8)] for _ in range(8)]
         
@@ -18,6 +18,11 @@ class OthelloGame:
         self.board[4][4] = 2  # 백돌
         
         self.current_player = 1  # 1: 흑돌, 2: 백돌
+        self.mode = mode  # "human_vs_ai" 또는 "human_vs_human"
+        self.human_player = human_player  # AI 모드에서만 사용 (1: 흑돌, 2: 백돌)
+        self.ai_player = 2 if human_player == 1 else 1  # AI 모드에서만 사용
+        self.player1_name = player1_name  # 2인용 모드에서만 사용
+        self.player2_name = player2_name  # 2인용 모드에서만 사용
         self.game_over = False
         self.winner = None
         self.pass_count = 0  # 연속 패스 횟수
@@ -112,21 +117,50 @@ class OthelloGame:
     
     def _check_game_over(self):
         """게임 종료 조건 확인"""
-        # 보드가 가득 찬 경우
-        if all(self.board[row][col] != 0 for row in range(8) for col in range(8)):
+        # 1. 보드가 가득 찬 경우
+        if self._is_board_full():
             self.game_over = True
             self._determine_winner()
             return
         
-        # 연속으로 2번 패스한 경우
+        # 2. 한쪽 돌이 모두 사라진 경우
+        black_count = self.get_black_count()
+        white_count = self.get_white_count()
+        if black_count == 0 or white_count == 0:
+            self.game_over = True
+            self._determine_winner()
+            return
+        
+        # 3. 연속 2번 패스 (양쪽 모두 둘 곳이 없음)
         if self.pass_count >= 2:
             self.game_over = True
             self._determine_winner()
             return
         
-        # 현재 플레이어가 둘 수 있는 수가 없는 경우
+        # 4. 현재 플레이어가 둘 수 있는 수가 없는 경우
         if not self.get_valid_moves():
-            self.pass_turn()
+            # 상대방도 둘 수 있는 수가 없는지 확인
+            opponent = 2 if self.current_player == 1 else 1
+            original_player = self.current_player
+            
+            # 상대방 차례로 변경하여 유효한 수 확인
+            self.current_player = opponent
+            opponent_has_moves = len(self.get_valid_moves()) > 0
+            self.current_player = original_player
+            
+            if not opponent_has_moves:
+                # 둘 다 둘 수 없으면 게임 종료
+                self.game_over = True
+                self._determine_winner()
+                return
+            else:
+                # 현재 플레이어만 둘 수 없으면 패스
+                self.pass_turn()
+                return
+    
+    def _is_board_full(self) -> bool:
+        """보드가 가득 찼는지 확인"""
+        return all(self.board[row][col] != 0 for row in range(8) for col in range(8))
     
     def _determine_winner(self):
         """승자 결정"""
@@ -154,20 +188,49 @@ class OthelloGame:
     
     def get_state(self) -> dict:
         """게임 상태 반환"""
+        valid_moves = self.get_valid_moves()
+        
+        # 게임 상태 메시지 생성
+        status_message = ""
+        last_action = "move"  # 기본값
+        
+        if self.game_over:
+            if self.winner == 1:
+                status_message = "게임 종료! 흑돌이 승리했습니다!"
+            elif self.winner == 2:
+                status_message = "게임 종료! 백돌이 승리했습니다!"
+            else:
+                status_message = "게임 종료! 무승부입니다!"
+        elif len(valid_moves) == 0:
+            status_message = f"{'흑돌' if self.current_player == 1 else '백돌'}이 둘 수 있는 수가 없습니다. 턴을 패스합니다."
+            last_action = "pass"
+        else:
+            player_type = "사용자" if self.current_player == self.human_player else "AI"
+            stone_color = "흑돌" if self.current_player == 1 else "백돌"
+            status_message = f"{player_type} ({stone_color})의 차례입니다."
+        
         return {
             "board": self.board,
             "current_player": self.current_player,
-            "valid_moves": self.get_valid_moves(),
+            "valid_moves": valid_moves,
             "game_over": self.game_over,
             "winner": self.winner,
             "black_count": self.get_black_count(),
             "white_count": self.get_white_count(),
-            "pass_count": self.pass_count
+            "pass_count": self.pass_count,
+            "status_message": status_message,
+            "can_pass": len(valid_moves) == 0 and not self.game_over,
+            "mode": self.mode,
+            "player1_name": self.player1_name,
+            "player2_name": self.player2_name,
+            "human_player": self.human_player if self.mode == "human_vs_ai" else None,
+            "ai_player": self.ai_player if self.mode == "human_vs_ai" else None,
+            "last_action": last_action
         }
     
     def copy(self):
         """게임 상태 복사 (AI에서 사용)"""
-        new_game = OthelloGame()
+        new_game = OthelloGame(self.mode, self.human_player, self.player1_name, self.player2_name)
         new_game.board = copy.deepcopy(self.board)
         new_game.current_player = self.current_player
         new_game.game_over = self.game_over
