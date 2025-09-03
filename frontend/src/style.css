@@ -1,0 +1,308 @@
+/* Figma 디자인 시스템 기반 CSS */
+:root {
+  /* Colors from Figma */
+  --color-primary: #219653;
+  --color-board-bg: #c4c4c4;
+  --color-board-border: #333333;
+  --color-black-stone: #333333;
+  --color-white-stone: #f2f2f2;
+  --color-valid-move: rgba(33, 150, 83, 0.3);
+  --color-panel-bg: #f2f2f2;
+  --color-panel-border: #cccccc;
+  --color-button-primary: #219653;
+  --color-button-secondary: #1a6b42;
+  --color-button-ai: #1a4d80;
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  --color-text-light: #999999;
+  --color-text-white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#app {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.game-container {
+  background: var(--color-primary);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 2px;
+  background: var(--color-board-border);
+  border: 2px solid var(--color-board-border);
+  border-radius: 8px;
+  width: 480px;
+  height: 480px;
+}
+
+.cell {
+  background: var(--color-board-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.cell:hover {
+  background: var(--color-valid-move);
+}
+
+.cell.valid-move {
+  background: var(--color-valid-move);
+}
+
+.cell.valid-move::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.stone {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.stone.black {
+  background: var(--color-black-stone);
+}
+
+.stone.white {
+  background: var(--color-white-stone);
+  border: 1px solid var(--color-board-border);
+}
+
+.game-info {
+  background: var(--color-panel-bg);
+  border: 1px solid var(--color-panel-border);
+  border-radius: 12px;
+  padding: 30px;
+  width: 300px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.game-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.score-panel {
+  background: white;
+  border: 2px solid var(--color-panel-border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.score-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.score-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.score-item.black {
+  background: var(--color-black-stone);
+  color: var(--color-text-white);
+}
+
+.score-item.white {
+  background: var(--color-white-stone);
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-board-border);
+}
+
+.score-stone {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.score-stone.black {
+  background: var(--color-black-stone);
+}
+
+.score-stone.white {
+  background: var(--color-white-stone);
+  border: 1px solid var(--color-board-border);
+}
+
+.current-player {
+  background: var(--color-black-stone);
+  color: var(--color-text-white);
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.game-button {
+  padding: 15px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--color-text-white);
+}
+
+.game-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.game-button:active {
+  transform: translateY(0);
+}
+
+.button-new-game {
+  background: var(--color-button-primary);
+}
+
+.button-new-game:hover {
+  background: var(--color-button-secondary);
+}
+
+.button-ai-move {
+  background: var(--color-button-ai);
+}
+
+.button-ai-move:hover {
+  background: #0f3a5f;
+}
+
+.game-status {
+  background: var(--color-panel-bg);
+  border: 1px solid var(--color-panel-border);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.valid-moves {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
+}
+
+.instruction {
+  font-size: 12px;
+  color: var(--color-text-light);
+}
+
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.ai-thinking {
+  position: relative;
+}
+
+.ai-thinking::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--color-text-white);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  #app {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .game-board {
+    width: 320px;
+    height: 320px;
+  }
+  
+  .stone {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .game-info {
+    width: 100%;
+    max-width: 320px;
+  }
+}
