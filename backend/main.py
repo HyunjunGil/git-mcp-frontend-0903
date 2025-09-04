@@ -207,9 +207,6 @@ async def undo_move(game_id: str):
     if not game.can_undo():
         raise HTTPException(status_code=400, detail="Cannot undo - no moves to undo")
     
-    if game.is_game_over():
-        raise HTTPException(status_code=400, detail="Cannot undo - game is over")
-    
     success = game.undo_move()
     if not success:
         raise HTTPException(status_code=500, detail="Failed to undo move")

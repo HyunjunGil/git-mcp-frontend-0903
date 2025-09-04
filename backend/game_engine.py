@@ -65,6 +65,7 @@ class OthelloGame:
             'move_position': move_position
         }
         self.history.append(state)
+        print(f"State saved: {move_type}, history length now: {len(self.history)}")
     
     def is_valid_position(self, row: int, col: int) -> bool:
         """보드 범위 내의 유효한 위치인지 확인"""
@@ -275,7 +276,9 @@ class OthelloGame:
     
     def can_undo(self) -> bool:
         """되돌리기가 가능한지 확인 (초기 상태가 아닌 경우)"""
-        return len(self.history) > 1
+        result = len(self.history) > 1
+        print(f"can_undo: history length = {len(self.history)}, result = {result}")
+        return result
     
     def undo_move(self) -> bool:
         """한 수 되돌리기"""

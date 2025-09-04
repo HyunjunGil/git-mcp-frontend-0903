@@ -81,7 +81,7 @@
         <button
           class="game-button button-undo"
           @click="undoMove"
-          :disabled="!canUndo || isAiThinking || gameOver"
+          :disabled="!canUndo || isAiThinking"
         >
           UNDO MOVE
         </button>
@@ -398,6 +398,14 @@ export default {
       this.lastAction = state.last_action || 'move'
       this.lastMove = state.last_move || null
       
+      // 디버깅용 로그
+      console.log('Game State Updated:', {
+        canUndo: this.canUndo,
+        historyLength: state.history_length,
+        gameOver: this.gameOver,
+        isAiThinking: this.isAiThinking
+      })
+      
       // 게임 모드 정보 업데이트
       if (state.mode) {
         this.gameMode = state.mode
@@ -451,12 +459,22 @@ export default {
     },
     
     async undoMove() {
-      if (!this.canUndo || this.isAiThinking || this.gameOver) {
+      console.log('undoMove called:', {
+        canUndo: this.canUndo,
+        isAiThinking: this.isAiThinking,
+        gameOver: this.gameOver,
+        gameId: this.gameId
+      })
+      
+      if (!this.canUndo || this.isAiThinking) {
+        console.log('undoMove blocked by conditions')
         return
       }
 
       try {
+        console.log('Sending undo request...')
         const response = await axios.post(`/api/game/${this.gameId}/undo`)
+        console.log('Undo response:', response.data)
         this.updateGameState(response.data)
       } catch (error) {
         console.error('Failed to undo move:', error)
