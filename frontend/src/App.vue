@@ -78,6 +78,13 @@
         >
           PASS TURN
         </button>
+        <button
+          class="game-button button-undo"
+          @click="undoMove"
+          :disabled="!canUndo || isAiThinking || gameOver"
+        >
+          UNDO MOVE
+        </button>
       </div>
 
       <div class="game-status">
@@ -200,6 +207,7 @@ export default {
       isAiThinking: false,
       statusMessage: '',
       canPass: false,
+      canUndo: false,
       showGameOverModal: false,
       showModeSelection: true,
       showPlayerSelection: false,
@@ -386,6 +394,7 @@ export default {
       this.passCount = state.pass_count
       this.statusMessage = state.status_message || ''
       this.canPass = state.can_pass || false
+      this.canUndo = state.can_undo || false
       this.lastAction = state.last_action || 'move'
       this.lastMove = state.last_move || null
       
@@ -438,6 +447,19 @@ export default {
         }
       } catch (error) {
         console.error('Failed to pass turn:', error)
+      }
+    },
+    
+    async undoMove() {
+      if (!this.canUndo || this.isAiThinking || this.gameOver) {
+        return
+      }
+
+      try {
+        const response = await axios.post(`/api/game/${this.gameId}/undo`)
+        this.updateGameState(response.data)
+      } catch (error) {
+        console.error('Failed to undo move:', error)
       }
     },
     

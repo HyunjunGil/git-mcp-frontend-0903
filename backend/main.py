@@ -196,6 +196,26 @@ async def get_current_player(game_id: str):
         "player2_name": game.player2_name
     }
 
+@app.post("/api/game/{game_id}/undo")
+async def undo_move(game_id: str):
+    """한 수 되돌리기"""
+    if game_id not in games:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    game = games[game_id]
+    
+    if not game.can_undo():
+        raise HTTPException(status_code=400, detail="Cannot undo - no moves to undo")
+    
+    if game.is_game_over():
+        raise HTTPException(status_code=400, detail="Cannot undo - game is over")
+    
+    success = game.undo_move()
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to undo move")
+    
+    return game.get_state()
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
