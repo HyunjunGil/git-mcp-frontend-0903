@@ -28,12 +28,43 @@ class OthelloGame:
         self.pass_count = 0  # 연속 패스 횟수
         self.last_move = None  # 마지막 수 위치 (row, col)
         
+        # 게임 히스토리 - 각 수에 대한 상태 저장
+        self.history = []
+        self._save_initial_state()
+        
         # 8방향 벡터 (상, 하, 좌, 우, 대각선)
         self.directions = [
             (-1, -1), (-1, 0), (-1, 1),
             (0, -1),           (0, 1),
             (1, -1),  (1, 0),  (1, 1)
         ]
+    
+    def _save_initial_state(self):
+        """초기 게임 상태를 히스토리에 저장"""
+        state = {
+            'board': copy.deepcopy(self.board),
+            'current_player': self.current_player,
+            'game_over': self.game_over,
+            'winner': self.winner,
+            'pass_count': self.pass_count,
+            'last_move': self.last_move,
+            'move_type': 'initial'
+        }
+        self.history.append(state)
+    
+    def _save_state(self, move_type='move', move_position=None):
+        """현재 게임 상태를 히스토리에 저장"""
+        state = {
+            'board': copy.deepcopy(self.board),
+            'current_player': self.current_player,
+            'game_over': self.game_over,
+            'winner': self.winner,
+            'pass_count': self.pass_count,
+            'last_move': self.last_move,
+            'move_type': move_type,
+            'move_position': move_position
+        }
+        self.history.append(state)
     
     def is_valid_position(self, row: int, col: int) -> bool:
         """보드 범위 내의 유효한 위치인지 확인"""
@@ -98,6 +129,9 @@ class OthelloGame:
         # 게임 종료 조건 확인
         self._check_game_over()
         
+        # 상태를 히스토리에 저장
+        self._save_state('move', (row, col))
+        
         return True
     
     def _flip_in_direction(self, row: int, col: int, dr: int, dc: int):
@@ -119,6 +153,9 @@ class OthelloGame:
         self.last_move = None  # 패스 시 마지막 수 위치 초기화
         self.current_player = 2 if self.current_player == 1 else 1
         self._check_game_over()
+        
+        # 상태를 히스토리에 저장
+        self._save_state('pass')
     
     def _check_game_over(self):
         """게임 종료 조건 확인"""
@@ -225,6 +262,8 @@ class OthelloGame:
             "pass_count": self.pass_count,
             "status_message": status_message,
             "can_pass": len(valid_moves) == 0 and not self.game_over,
+            "can_undo": self.can_undo(),
+            "history_length": self.get_history_length(),
             "mode": self.mode,
             "player1_name": self.player1_name,
             "player2_name": self.player2_name,
@@ -233,6 +272,33 @@ class OthelloGame:
             "last_action": last_action,
             "last_move": self.last_move
         }
+    
+    def can_undo(self) -> bool:
+        """되돌리기가 가능한지 확인 (초기 상태가 아닌 경우)"""
+        return len(self.history) > 1
+    
+    def undo_move(self) -> bool:
+        """한 수 되돌리기"""
+        if not self.can_undo():
+            return False
+        
+        # 현재 상태 제거
+        self.history.pop()
+        
+        # 이전 상태로 복원
+        previous_state = self.history[-1]
+        self.board = copy.deepcopy(previous_state['board'])
+        self.current_player = previous_state['current_player']
+        self.game_over = previous_state['game_over']
+        self.winner = previous_state['winner']
+        self.pass_count = previous_state['pass_count']
+        self.last_move = previous_state['last_move']
+        
+        return True
+    
+    def get_history_length(self) -> int:
+        """히스토리 길이 반환"""
+        return len(self.history)
     
     def copy(self):
         """게임 상태 복사 (AI에서 사용)"""
@@ -243,4 +309,5 @@ class OthelloGame:
         new_game.winner = self.winner
         new_game.pass_count = self.pass_count
         new_game.last_move = self.last_move
+        new_game.history = copy.deepcopy(self.history)
         return new_game

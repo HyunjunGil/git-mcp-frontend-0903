@@ -277,6 +277,46 @@ body {
   background: #0f3a5f;
 }
 
+.button-undo {
+  background: #f39c12;
+}
+
+.button-undo:hover {
+  background: #e67e22;
+}
+
+.button-undo:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button-undo:disabled:hover {
+  background: #bdc3c7;
+  transform: none;
+  box-shadow: none;
+}
+
+.button-pass {
+  background: #95a5a6;
+}
+
+.button-pass:hover {
+  background: #7f8c8d;
+}
+
+.button-pass:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button-pass:disabled:hover {
+  background: #bdc3c7;
+  transform: none;
+  box-shadow: none;
+}
+
 .game-status {
   background: var(--color-panel-bg);
   border: 1px solid var(--color-panel-border);
